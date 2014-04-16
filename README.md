@@ -30,7 +30,7 @@ Optionally, you can use this fork using bundler:
 or require it with:
 
 ```ruby
-   require 'mqtt'
+   require 'mqttx'
 ```
 
 ## MQTT Protocol ##

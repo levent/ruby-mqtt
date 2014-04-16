@@ -10,7 +10,7 @@ $:.unshift(File.dirname(__FILE__))
 
 require 'bundler'
 Bundler.require(:default, :development)
-require 'mqtt'
+require 'mqttx'
 
 # MQTT_HOST = 'localhost'
 MQTT_HOST = ENV['MQTT_HOST'] || 'localhost'

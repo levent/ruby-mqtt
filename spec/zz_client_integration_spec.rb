@@ -1,7 +1,7 @@
 $:.unshift(File.dirname(__FILE__))
 
 require 'spec_helper'
-require 'mqtt'
+require 'mqttx'
 require 'fake_server'
 
 describe "a client talking to a server" do

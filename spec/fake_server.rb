@@ -18,7 +18,7 @@ $:.unshift File.dirname(__FILE__)+'/../lib'
 
 require 'logger'
 require 'socket'
-require 'mqtt'
+require 'mqttx'
 
 
 class MQTT::FakeServer
