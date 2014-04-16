@@ -1,7 +1,7 @@
 ruby-mqttx
 =========
 
-Pure Ruby gem that implements the MQTT (Message Queue Telemetry Transport) protocol. MQTT is a machine-to-machine (M2M)/"Internet of Things" connectivity protocol. Designed as an extremely lightweight publish/subscribe messaging transport, it is useful for connections with remote locations where a small code footprint is required and/or network bandwidth is at a premium.
+Pure Ruby gem that implements the MQTT protocol, a lightweight protocol for publish/subscribe messaging.
 
 This fork is mainly based for the support of QOS=1 and QOS=2.
 
@@ -216,11 +216,13 @@ Resources
 * GitHub Project: http://github.com/njh/ruby-mqtt
 * API Documentation: http://rubydoc.info/gems/mqtt/frames
 
+
 License
 -------
 
 The ruby-mqtt gem is licensed under the terms of the MIT license.
 See the file LICENSE for details.
+
 
 Contact
 -------

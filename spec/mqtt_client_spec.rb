@@ -267,7 +267,15 @@ describe MQTT::Client do
     end
 
     context "and using ssl" do
-      let(:ssl_socket) { double("SSLSocket", :sync_close= => true, :write => true, :connect => true) }
+      let(:ssl_socket) {
+        double(
+          "SSLSocket",
+          :sync_close= => true,
+          :write => true,
+          :connect => true,
+          :closed? => false
+        )
+      }
 
       it "should use ssl if it enabled using the :ssl => true parameter" do
         OpenSSL::SSL::SSLSocket.should_receive(:new).and_return(ssl_socket)
@@ -283,6 +291,16 @@ describe MQTT::Client do
         ssl_socket.should_receive(:connect)
 
         client = MQTT::Client.new('mqtts://mqtt.example.com')
+        client.stub(:receive_connack)
+        client.connect
+      end
+
+      it "should use set the SSL version, if the :ssl parameter is a symbol" do
+        OpenSSL::SSL::SSLSocket.should_receive(:new).and_return(ssl_socket)
+        ssl_socket.should_receive(:connect)
+
+        client = MQTT::Client.new('mqtt.example.com', :ssl => :TLSv1)
+        client.ssl_context.should_receive('ssl_version=').with(:TLSv1)
         client.stub(:receive_connack)
         client.connect
       end

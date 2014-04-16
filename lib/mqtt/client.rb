@@ -1,5 +1,7 @@
 require 'set'
 autoload :OpenSSL, 'openssl'
+autoload :URI, 'uri'
+
 
 
 # Client class for talking to an MQTT broker
@@ -11,7 +13,14 @@ class MQTT::Client
   # Port number of the remote broker
   attr_accessor :remote_port
 
-  # True to enable SSL/TLS encrypted communication
+  # Set to true to enable SSL/TLS encrypted communication
+  #
+  # Set to a symbol to use a specific variant of SSL/TLS.
+  # Allowed values include:
+  #
+  # @example Using TLS 1.0
+  #    client = Client.new('mqtt.example.com', :ssl => :TLSv1)
+  # @see OpenSSL::SSL::SSLContext::METHODS
   attr_accessor :ssl
 
   # Time (in seconds) between pings to remote broker
@@ -75,6 +84,7 @@ class MQTT::Client
   }
 
   # Create and connect a new MQTT Client
+  #
   # Accepts the same arguments as creating a new client.
   # If a block is given, then it will be executed before disconnecting again.
   #
@@ -208,6 +218,10 @@ class MQTT::Client
     end
   end
 
+  # Set the Will for the client
+  #
+  # The will is a message that will be delivered by the broker when the client dies.
+  # The Will must be set before establishing a connection to the broker
   def set_will(topic, payload, retain=false, qos=0)
     self.will_topic = topic
     self.will_payload = payload
@@ -308,10 +322,13 @@ class MQTT::Client
 
   # Checks whether the client is connected to the broker.
   def connected?
-    not @socket.nil?
+    (not @socket.nil?) and (not @socket.closed?)
   end
 
   # Send a MQTT ping message to indicate that the MQTT client is alive.
+  #
+  # Note that you will not normally need to call this method
+  # as it is called automatically
   def ping
     packet = MQTT::Packet::Pingreq.new
     send_packet(packet)
@@ -512,7 +529,7 @@ private
           subscribe(@subscriptions.first) unless @subscriptions.empty?
         end
 
-        result = IO.select([@socket], nil, nil, SELECT_TIMEOUT)
+        result = IO.select([@socket], nil,nil, SELECT_TIMEOUT)
       rescue => err
         if @reconnect
           @socket = nil
@@ -522,6 +539,7 @@ private
           raise err
         end
       end
+
 
       unless result.nil?
         # Yes - read in the packet

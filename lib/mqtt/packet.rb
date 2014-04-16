@@ -5,7 +5,6 @@ module MQTT
   # Class representing a MQTT Packet
   # Performs binary encoding and decoding of headers
   class MQTT::Packet
-
     # Duplicate delivery flag
     attr_reader :duplicate
 
@@ -121,6 +120,7 @@ module MQTT
       @creation_timestamp = Time.now.to_i
     end
 
+    # Set packet attributes from a hash of attribute names and values
     def update_attributes(attr={})
       attr.each_pair do |k,v|
         send("#{k}=", v)
@@ -214,6 +214,7 @@ module MQTT
       header.pack('C*') + body
     end
 
+    # Returns a human readable string
     def inspect
       "\#<#{self.class}>"
     end
@@ -283,10 +284,17 @@ module MQTT
 
     # Class representing an MQTT Publish message
     class Publish < MQTT::Packet
+      # The topic name to publish to
       attr_accessor :topic
+
+      # Identifier for an individual publishing flow
+      # Only required in PUBLISH Packets where the QoS level is 1 or 2
       attr_accessor :message_id
+
+      # The data to be published
       attr_accessor :payload
 
+      # Default attribute values
       ATTR_DEFAULTS = {
           :topic => nil,
           :message_id => 0,
@@ -318,6 +326,7 @@ module MQTT
         @payload = buffer
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         "\#<#{self.class}: " +
         "d#{duplicate ? '1' : '0'}, " +
@@ -331,7 +340,7 @@ module MQTT
       protected
       def inspect_payload
         str = payload.to_s
-        if str.bytesize < 16
+        if str.bytesize < 16 and str =~ /^[ -~]*$/
           "'#{str}'"
         else
           "... (#{str.bytesize} bytes)"
@@ -341,18 +350,40 @@ module MQTT
 
     # Class representing an MQTT Connect Packet
     class Connect < MQTT::Packet
+      # The name of the protocol (defaults to MQIsdp)
       attr_accessor :protocol_name
+
+      # The version number of the protocol (defaults to 3)
       attr_accessor :protocol_version
+
+      # The client identifier string
       attr_accessor :client_id
+
+      # Set to false to keep a persistent session with the broker
       attr_accessor :clean_session
+
+      # Period the broker should keep connection open for between pings
       attr_accessor :keep_alive
+
+      # The topic name to send the Will message to
       attr_accessor :will_topic
+
+      # The QoS level to send the Will message as
       attr_accessor :will_qos
+
+      # Set to true to make the Will message retained
       attr_accessor :will_retain
+
+      # The payload of the Will message
       attr_accessor :will_payload
+
+      # The username for authenticating with the broker
       attr_accessor :username
+
+      # The password for authenticating with the broker
       attr_accessor :password
 
+      # Default attribute values
       ATTR_DEFAULTS = {
         :protocol_name => 'MQIsdp',
         :protocol_version => 0x03,
@@ -450,6 +481,7 @@ module MQTT
         end
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         str = "\#<#{self.class}: "
         str += "keep_alive=#{keep_alive}"
@@ -463,7 +495,10 @@ module MQTT
 
     # Class representing an MQTT Connect Acknowledgment Packet
     class Connack < MQTT::Packet
+      # The return code (defaults to 0 for connection accepted)
       attr_accessor :return_code
+
+      # Default attribute values
       ATTR_DEFAULTS = {:return_code => 0x00}
 
       # Create a new Client Connect packet
@@ -509,6 +544,7 @@ module MQTT
         end
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         "\#<#{self.class}: 0x%2.2X>" % return_code
       end
@@ -516,7 +552,10 @@ module MQTT
 
     # Class representing an MQTT Publish Acknowledgment packet
     class Puback < MQTT::Packet
+      # Identifier for an individual publishing flow
       attr_accessor :message_id
+
+      # Default attribute values
       ATTR_DEFAULTS = {:message_id => 0}
 
       # Create a new Publish Acknowledgment packet
@@ -538,6 +577,7 @@ module MQTT
         end
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         "\#<#{self.class}: 0x%2.2X>" % message_id
       end
@@ -545,7 +585,10 @@ module MQTT
 
     # Class representing an MQTT Publish Received packet
     class Pubrec < MQTT::Packet
+      # Identifier for an individual publishing flow
       attr_accessor :message_id
+
+      # Default attribute values
       ATTR_DEFAULTS = {:message_id => 0}
 
       # Create a new Publish Recieved packet
@@ -567,6 +610,7 @@ module MQTT
         end
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         "\#<#{self.class}: 0x%2.2X>" % message_id
       end
@@ -574,6 +618,7 @@ module MQTT
 
     # Class representing an MQTT Publish Release packet
     class Pubrel < MQTT::Packet
+      # Identifier for an individual publishing flow
       attr_accessor :message_id
 
       ATTR_DEFAULTS = {:message_id => 0,:qos => 1}
@@ -597,6 +642,7 @@ module MQTT
         end
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         "\#<#{self.class}: 0x%2.2X>" % message_id
       end
@@ -604,7 +650,10 @@ module MQTT
 
     # Class representing an MQTT Publish Complete packet
     class Pubcomp < MQTT::Packet
+      # Identifier for an individual publishing flow
       attr_accessor :message_id
+
+      # Default attribute values
       ATTR_DEFAULTS = {:message_id => 0}
 
       # Create a new Publish Complete packet
@@ -626,6 +675,7 @@ module MQTT
         end
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         "\#<#{self.class}: 0x%2.2X>" % message_id
       end
@@ -633,8 +683,13 @@ module MQTT
 
     # Class representing an MQTT Client Subscribe packet
     class Subscribe < MQTT::Packet
+      # Identifier for an individual publishing flow
       attr_accessor :message_id
+
+      # One or more topic names to subscribe to
       attr_reader :topics
+
+      # Default attribute values
       ATTR_DEFAULTS = {:message_id => 0}
 
       # Create a new Subscribe packet
@@ -711,6 +766,7 @@ module MQTT
         end
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         _str = "\#<#{self.class}: 0x%2.2X, %s>" % [
           message_id,
@@ -721,8 +777,13 @@ module MQTT
 
     # Class representing an MQTT Subscribe Acknowledgment packet
     class Suback < MQTT::Packet
+      # Identifier to tie the Subscribe request to the Suback response
       attr_accessor :message_id
+
+      # The QoS level that was granted for the subscribe request
       attr_reader :granted_qos
+
+      # Default attribute values
       ATTR_DEFAULTS = {:message_id => 0}
 
       # Create a new Subscribe Acknowledgment packet
@@ -762,6 +823,7 @@ module MQTT
         end
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         "\#<#{self.class}: 0x%2.2X, qos=%s>" % [message_id, granted_qos.join(',')]
       end
@@ -769,8 +831,13 @@ module MQTT
 
     # Class representing an MQTT Client Unsubscribe packet
     class Unsubscribe < MQTT::Packet
+      # One or more topics to unsubscribe from
       attr_reader :topics
+
+      # Identifier to tie the Unsubscribe request to the Unsuback response
       attr_accessor :message_id
+
+      # Default attribute values
       ATTR_DEFAULTS = {:message_id => 0}
 
       # Create a new Unsubscribe packet
@@ -780,6 +847,7 @@ module MQTT
         @qos = 1 # Force a QOS of 1
       end
 
+      # Set one or more topics to unsubscribe from
       def topics=(value)
         if value.is_a?(Array)
           @topics = value
@@ -807,6 +875,7 @@ module MQTT
         end
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         "\#<#{self.class}: 0x%2.2X, %s>" % [
           message_id,
@@ -817,7 +886,10 @@ module MQTT
 
     # Class representing an MQTT Unsubscribe Acknowledgment packet
     class Unsuback < MQTT::Packet
+      # Identifier to tie the Unsubscribe request to the Unsuback response
       attr_accessor :message_id
+
+      # Default attribute values
       ATTR_DEFAULTS = {:message_id => 0}
 
       # Create a new Unsubscribe Acknowledgment packet
@@ -839,6 +911,7 @@ module MQTT
         end
       end
 
+      # Returns a human readable string, summarising the properties of the packet
       def inspect
         "\#<#{self.class}: 0x%2.2X>" % message_id
       end
