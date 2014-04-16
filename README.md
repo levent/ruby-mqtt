@@ -155,7 +155,7 @@ The default options for the map parameter are:
 
        :reconnect => false,
        :ssl => false,
-       :v311  => false
+       :protocol_version  => :v31
     }
 
 * :keep_alive - Time to determine a live client/server
@@ -175,7 +175,7 @@ Miscellanea parameters.
 
 * :reconnect - If the connection is dropped, reconnect.
 * :ssl - If the connection will use a ssl connection
-* :v311 By default, messages are sent complying with the MQTT 3.1.0 spec. With this parameter set as "true", the messages are sent based on the MQTT 3.1.1 spec.
+* :protocol_version By default, messages are sent complying with the MQTT 3.1.0 spec. With this parameter set as `:v31`, the messages are sent based on the MQTT 3.1.1 spec. If you want to use the 3.1.1 MQTT spec, you need to set this value to `:v311`
 
 Subscribe
 Select topic and qos level (0 if not provided)

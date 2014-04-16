@@ -22,7 +22,7 @@ def get_base_connection_map()
   base_map = {
     :remote_host => MQTT_HOST,
     :remote_port => MQTT_PORT,
-    :v311 => true,
+    :protocol_version => :v311,
     :clean_session => true,
     :reconnect => false
   }

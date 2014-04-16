@@ -45,7 +45,7 @@ class MQTT::Client
   attr_accessor :will_retain
 
   # MQTT V3.1.1 version
-  attr_accessor :v311
+  attr_accessor :protocol_version
 
   # Reconnect after a dropped connection
   attr_accessor :reconnect
@@ -70,7 +70,7 @@ class MQTT::Client
     :will_payload => nil,
     :will_qos => 0,
     :will_retain => false,
-    :v311  => false,
+    :protocol_version  => :v31,
     :ssl => false
   }
 
@@ -229,7 +229,7 @@ class MQTT::Client
       :will_retain => @will_retain
     )
 
-    if @v311
+    if @protocol_version == :v311
       packet.protocol_name = 'MQTT'
       packet.protocol_version = 0x4
     end
@@ -250,7 +250,7 @@ class MQTT::Client
 
     is_empty_client_id = @client_id.nil?
     #MQTT 3.1.1 spec supports ids with zero length
-    is_empty_client_id = true if @v311 == false and @client_id.nil? == false and @client_id.empty?
+    is_empty_client_id = true if @protocol_version != :v311 and @client_id.nil? == false and @client_id.empty?
 
     if is_empty_client_id
       if @clean_session
