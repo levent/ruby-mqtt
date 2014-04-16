@@ -1,8 +1,9 @@
-ruby-mqtt
+ruby-mqttx
 =========
 
 Pure Ruby gem that implements the MQTT (Message Queue Telemetry Transport) protocol. MQTT is a machine-to-machine (M2M)/"Internet of Things" connectivity protocol. Designed as an extremely lightweight publish/subscribe messaging transport, it is useful for connections with remote locations where a small code footprint is required and/or network bandwidth is at a premium.
 
+This fork is mainly based for the support of QOS=1 and QOS=2.
 
 ## Table of Contents ##
 - [Installation](#installation)
@@ -15,13 +16,22 @@ Pure Ruby gem that implements the MQTT (Message Queue Telemetry Transport) proto
 Installation
 ------------
 
-You may get the latest stable version from Rubygems at:
+You can obtain the .gem file and install with:
 
-~~$ gem install mqtt~~ Unavailable while the merge request is not finished.
+```
+   $ gem install mqttx-X.X.X.gem
+```
 
 Optionally, you can use this fork using bundler:
+```
+    gem 'mqttx', :git => 'https://github.com/tierconnect/ruby-mqtt.git'
+```
 
-    gem 'mqtt', :git => 'https://github.com/tierconnect/ruby-mqtt.git'
+or require it with:
+
+```ruby
+   require 'mqtt'
+```
 
 ## MQTT Protocol ##
 
@@ -36,7 +46,7 @@ To provide more flexibility, MQTT supports a hierarchical topic namespace. This 
 For subscriptions, two wildcard characters are supported:
 
 * A '#' character represents a complete sub-tree of the hierarchy, and thus, must be the last character in a subscription topic string, such as SENSOR/#. This will match any topic starting with SENSOR/, such as SENSOR/1/TEMP and SENSOR/2/HUMIDITY.
-	
+
 * A '+' character represents a single level of the hierarchy and is used between delimiters. For example, SENSOR/+/TEMP will match SENSOR/1/TEMP and SENSOR/2/TEMP.
 
 Publishers are not allowed to use the wildcard characters in their topic names.
@@ -48,8 +58,8 @@ Quality of Service is a networking term that specifies a guaranteed throughput l
 
 Different levels of QoS are used in this ruby-mqtt interface:
 
-* QoS Level 0 - where a message is sent by the user to the server and all those currently connected to it. No confirmation of reception is returned to the user. 
-* QoS Level 1 - where the message is sent under the same conditions described for QoS Level 0, and a reception acknowledgement is issued by the server. 
+* QoS Level 0 - where a message is sent by the user to the server and all those currently connected to it. No confirmation of reception is returned to the user.
+* QoS Level 1 - where the message is sent under the same conditions described for QoS Level 0, and a reception acknowledgement is issued by the server.
 * QoS Level 2 - where a message is sent to the server requesting acknnowledgement of readiness for reception. The server responds indicating its readiness to receive the message. Afterwards, the same conditions apply as for QoS Level 1.
 
 Functionality does not change while using any of the 3 above-mentioned conditions. However, a higher level of QoS is oriented towards higher reliability and will, consequently, result in a slight decrease in speed.
@@ -82,12 +92,12 @@ The will message is comprised of a topic, payload, QoS level, and a retain value
 
     require 'rubygems'
     require 'mqtt'
-    
+
     # Publish example
     MQTT::Client.connect('test.mosquitto.org') do |c|
       c.publish('topic', 'message')
     end
-    
+
     # Subscribe example
     MQTT::Client.connect('test.mosquitto.org') do |c|
       # If you pass a block to the get method, then it will loop
@@ -103,7 +113,7 @@ Connection:
     client = MQTT::Client.connect('myserver.example.com')
     client = MQTT::Client.connect('myserver.example.com', 18830)
     client = MQTT::Client.connect({:remote_host => 'myserver.example.com',:remote_port => 1883 ... })
-    
+
 SSL Connection
 
     client = MQTT::Client.new({:remote_host => 'myserver.example.com',:remote_port => 1883,:ssl => true })
@@ -130,19 +140,19 @@ The default options for the map parameter are:
     ATTR_DEFAULTS = {
        :remote_host => nil,
        :remote_port => nil,
-    
+
        :keep_alive => 15,
        :clean_session => true,
        :client_id => nil,
        :ack_timeout => 5,
        :username => nil,
        :password => nil,
-    
+
        :will_topic => nil,
        :will_payload => nil,
        :will_qos => 0,
        :will_retain => false,
-    
+
        :reconnect => false,
        :ssl => false,
        :v311  => false
@@ -186,7 +196,7 @@ Publish
 Get Messages
 
     client.get(topic) do |topic,message|
-        
+
     end
 
 or

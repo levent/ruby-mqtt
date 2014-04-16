@@ -4,7 +4,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require "mqtt/version"
 
 Gem::Specification.new do |gem|
-  gem.name        = 'mqtt'
+  gem.name        = 'mqttx'
   gem.version     = MQTT::VERSION
   gem.author      = 'Nicholas J Humfrey'
   gem.email       = 'njh@aelius.com'
@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
 
   #gem.rubyforge_project = 'mqtt'
 
-  gem.files         = %w(README LICENSE NEWS) + Dir.glob('lib/**/*.rb')
+  gem.files         = %w(LICENSE) + Dir.glob('lib/**/*.rb')
   gem.test_files    = Dir.glob('spec/*_spec.rb')
   gem.executables   = %w()
   gem.require_paths = %w(lib)

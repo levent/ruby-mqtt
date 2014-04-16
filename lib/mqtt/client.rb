@@ -50,6 +50,8 @@ class MQTT::Client
   # Reconnect after a dropped connection
   attr_accessor :reconnect
 
+  attr_accessor :stop_receiving_publish_packets
+
   # Timeout between select polls (in seconds)
   SELECT_TIMEOUT = 0.5
 
@@ -179,6 +181,8 @@ class MQTT::Client
 
     @expected_messages_out = {}
     @expected_messages_in = {}
+
+    @stop_receiving_publish_packets = false
   end
 
   # Get the OpenSSL context, that is used if SSL/TLS is enabled
@@ -283,6 +287,7 @@ class MQTT::Client
   def disconnect(send_msg=true,wait_timeout=10)
     if connected?
       if send_msg
+        @stop_receiving_publish_packets = true
         begin
           timeout(wait_timeout) do
             while @expected_messages_out.keys.size > 0 or @expected_messages_in.keys.size > 0
@@ -532,6 +537,10 @@ private
           end
         end
         if packet.class == MQTT::Packet::Publish
+          if @stop_receiving_publish_packets
+            return
+          end
+
           message_id = packet.message_id
 
           if packet.qos == 0
